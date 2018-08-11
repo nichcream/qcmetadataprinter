@@ -1,17 +1,17 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-// Camera
-#include <cam_intf.h>
+// header containing the meta ids; use struct.py to generate
+#include "param_ids.h"
 
 #define CAM_LIB_MCT "libmmcamera2_mct.so"
 #define CAM_LIB_OEM "liboemcamera.so"
 
-#define PRINT(PARAM_ID, table_ptr)                                                                  \
-    blob_pointer = (char*)(get_pointer_of(PARAM_ID, table_ptr)) - (char*)(table_ptr);               \
-    oss_pointer = (char*)(POINTER_OF_META(PARAM_ID, table_ptr)) - (char*)(table_ptr);               \
+#define PRINT(PARAM_ID)                                                                             \
+    blob_pointer = (char*)(get_pointer_of(PARAM_ID, pMetadata)) - (char*)(pMetadata);               \
+    oss_pointer = (char*)(POINTER_OF_META(PARAM_ID, pMetadata)) - (char*)(pMetadata);               \
     blob_size = get_size_of(PARAM_ID);                                                              \
-    oss_size = SIZE_OF_PARAM(PARAM_ID, table_ptr);                                                  \
+    oss_size = SIZE_OF_PARAM(PARAM_ID, pMetadata);                                                  \
     if ((blob_pointer != oss_pointer) || (blob_size != oss_size)) printf("FIXME!!!\n");             \
     printf("BLOB: %s index=%d pointer=%d size=%d\n", #PARAM_ID, PARAM_ID, blob_pointer, blob_size); \
     printf("OSS : %s index=%d pointer=%d size=%d\n", #PARAM_ID, PARAM_ID, oss_pointer, oss_size);
@@ -63,8 +63,10 @@ int main() {
     int blob_size = 0;
     int oss_size = 0;
 
-    /* INCLUDE() macros from metadata_data_t go after this */
+    /* Print for all params defined in the macro generated */
+    FOR_EVERY_PARAM_ID(PRINT)
 
+    free(pMetadata);
     dlclose(handle);
     return 0;
 }

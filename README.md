@@ -4,11 +4,13 @@ It is located in QCamera2/stack/common/cam_intf.h
 
 Main idea is to compare output from functions get_pointer_of() and get_size_of() from binary libmmcamera2_mct.so, (liboemcamera.so for older devices) with values defined in oss header.
 
-To get started, you hav to make list of fields of metadata_data_t using special macro PRINT(), like 
+To get started, generate the param_ids.h header using struct.py. This creates a FOR_EVERY_PARAM_ID macro read during compile time, which can be easily modified/regenerated later on.
 
 ```
-    PRINT(CAM_INTF_META_FACE_DETECTION,         pMetadata);
-    PRINT(CAM_INTF_META_FACE_RECOG,             pMetadata);
+#define FOR_EVERY_PARAM_ID(MACRO) \
+    MACRO(CAM_INTF_META_HISTOGRAM) \
+    MACRO(CAM_INTF_META_FACE_DETECTION) \
+    MACRO(CAM_INTF_META_FACE_RECOG) \
 ```
 
 Next build it and copy get_offsets binary to /system/vendor/lib on your device where libmmcamera2_mct.so located.
@@ -24,8 +26,6 @@ OSS : CAM_INTF_META_CDS_DATA index=203 pointer=8840 size=68
 BLOB: CAM_INTF_PARM_UPDATE_DEBUG_LEVEL index=175 pointer=8908 size=4
 OSS : CAM_INTF_PARM_UPDATE_DEBUG_LEVEL index=175 pointer=8908 size=4
 ```
-
-Current code contains keys used on kuntao device.
 
 * BLOB means values found in libmmcamera2_mct.so
 * OSS means values from your current cam_intf.h
